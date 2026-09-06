@@ -1,11 +1,10 @@
+from __future__ import annotations
 import os
 
 from dotenv import load_dotenv
 from fastmcp.server.auth.providers.github import GitHubProvider
 
 load_dotenv()
-
-from __future__ import annotations
 
 from dataclasses import asdict
 from typing import Any
