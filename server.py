@@ -1,3 +1,10 @@
+import os
+
+from dotenv import load_dotenv
+from fastmcp.server.auth.providers.github import GitHubProvider
+
+load_dotenv()
+
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -15,6 +22,12 @@ from data_fetcher import get_stock_quote as fetch_stock_quote
 from data_fetcher import search_ticker as fetch_ticker_matches
 
 
+auth_provider = GitHubProvider(
+    client_id=os.environ["GITHUB_CLIENT_ID"],
+    client_secret=os.environ["GITHUB_CLIENT_SECRET"],
+    base_url="https://financial-data-server.fastmcp.app",
+)
+
 mcp = FastMCP(
     name="financial-data-server",
     instructions=(
@@ -23,6 +36,7 @@ mcp = FastMCP(
         "ticker symbol before calling other tools if you don't already "
         "have the exact ticker."
     ),
+    auth=auth_provider,
 )
 
 def _error(message: str) -> dict[str, Any]:
