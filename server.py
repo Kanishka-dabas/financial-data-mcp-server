@@ -22,8 +22,8 @@ from data_fetcher import search_ticker as fetch_ticker_matches
 
 
 auth_provider = GitHubProvider(
-    client_id=os.environ["GITHUB_CLIENT_ID"],
-    client_secret=os.environ["GITHUB_CLIENT_SECRET"],
+    client_id=os.environ.get("GITHUB_CLIENT_ID", ""),
+    client_secret=os.environ.get("GITHUB_CLIENT_SECRET", ""),
     base_url="https://financial-data-server.fastmcp.app",
 )
 
