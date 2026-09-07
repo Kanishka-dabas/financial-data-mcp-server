@@ -14,6 +14,14 @@ from data_fetcher import get_income_statement as fetch_income_statement
 from data_fetcher import get_stock_quote as fetch_stock_quote
 from data_fetcher import search_ticker as fetch_ticker_matches
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("financial-data-server")
+
 
 
 mcp = FastMCP(
@@ -49,12 +57,16 @@ def search_ticker(company_name: str) -> dict[str, Any]:
         "quote_type": str|None}, ...]} on success, or
         {"error": True, "message": str} if nothing matched.
     """
+    logger.info(f"search_ticker called with company_name={company_name!r}")
     try:
         matches = fetch_ticker_matches(company_name)
+        logger.info(f"search_ticker: found {len(matches)} match(es) for {company_name!r}")
         return {"matches": [asdict(m) for m in matches]}
     except DataFetchError as exc:
+        logger.warning(f"search_ticker failed for {company_name!r}: {exc}")
         return _error(str(exc))
     except Exception as exc:
+        logger.error(f"search_ticker unexpected error for {company_name!r}: {exc}")
         return _error(f"Unexpected error resolving '{company_name}': {exc}")
 
 
@@ -75,11 +87,16 @@ def get_stock_quote_tool(ticker: str) -> dict[str, Any]:
         A structured quote dict, or {"error": True, "message": str}
         if the ticker is invalid or data is unavailable.
     """
+    logger.info(f"get_stock_quote_tool called with ticker={ticker!r}")
     try:
-        return fetch_stock_quote(ticker)
+        result = fetch_stock_quote(ticker)
+        logger.info(f"get_stock_quote_tool: success for {ticker!r}")
+        return result
     except DataFetchError as exc:
+        logger.warning(f"get_stock_quote_tool failed for {ticker!r}: {exc}")
         return _error(str(exc))
     except Exception as exc:
+        logger.error(f"get_stock_quote_tool unexpected error for {ticker!r}: {exc}")
         return _error(f"Unexpected error fetching quote for '{ticker}': {exc}")
 
 
@@ -99,13 +116,18 @@ def get_company_overview_tool(ticker: str) -> dict[str, Any]:
         "message": str} if the ticker is invalid or data is
         unavailable.
     """
+    logger.info(f"get_company_overview_tool called with ticker={ticker!r}")
     try:
-        return fetch_company_overview(ticker)
+        result = fetch_company_overview(ticker)
+        logger.info(f"get_company_overview_tool: success for {ticker!r}")
+        return result
     except DataFetchError as exc:
+        logger.warning(f"get_company_overview_tool failed for {ticker!r}: {exc}")
         return _error(str(exc))
     except Exception as exc:
+        logger.error(f"get_company_overview_tool unexpected error for {ticker!r}: {exc}")
         return _error(f"Unexpected error fetching overview for '{ticker}': {exc}")
-
+    
 
 @mcp.tool
 def get_financial_ratios_tool(ticker: str) -> dict[str, Any]:
@@ -118,11 +140,16 @@ def get_financial_ratios_tool(ticker: str) -> dict[str, Any]:
         A dict with trailing/forward P/E, EPS, ROE, debt-to-equity,
         price-to-book, and profit margins, or {"error": True, "message": str}.
     """
+    logger.info(f"get_financial_ratios_tool called with ticker={ticker!r}")
     try:
-        return fetch_financial_ratios(ticker)
+        result = fetch_financial_ratios(ticker)
+        logger.info(f"get_financial_ratios_tool: success for {ticker!r}")
+        return result
     except DataFetchError as exc:
+        logger.warning(f"get_financial_ratios_tool failed for {ticker!r}: {exc}")
         return _error(str(exc))
     except Exception as exc:
+        logger.error(f"get_financial_ratios_tool unexpected error for {ticker!r}: {exc}")
         return _error(f"Unexpected error fetching ratios for '{ticker}': {exc}")
 
 
@@ -139,11 +166,16 @@ def get_historical_prices_tool(ticker: str, period: str = "1mo") -> dict[str, An
         {"symbol": str, "period": str, "candles": [{"date","open","high",
         "low","close","volume"}, ...]}, or {"error": True, "message": str}.
     """
+    logger.info(f"get_historical_prices_tool called with ticker={ticker!r}, period={period!r}")
     try:
-        return fetch_historical_prices(ticker, period)
+        result = fetch_historical_prices(ticker, period)
+        logger.info(f"get_historical_prices_tool: success for {ticker!r}")
+        return result
     except DataFetchError as exc:
+        logger.warning(f"get_historical_prices_tool failed for {ticker!r}: {exc}")
         return _error(str(exc))
     except Exception as exc:
+        logger.error(f"get_historical_prices_tool unexpected error for {ticker!r}: {exc}")
         return _error(f"Unexpected error fetching history for '{ticker}': {exc}")
 
 
@@ -160,13 +192,18 @@ def get_income_statement_tool(ticker: str, quarterly: bool = False) -> dict[str,
         {"symbol": str, "quarterly": bool, "periods": [...]}, or
         {"error": True, "message": str}.
     """
+    logger.info(f"get_income_statement_tool called with ticker={ticker!r}, quarterly={quarterly}")
     try:
-        return fetch_income_statement(ticker, quarterly)
+        result = fetch_income_statement(ticker, quarterly)
+        logger.info(f"get_income_statement_tool: success for {ticker!r}")
+        return result
     except DataFetchError as exc:
+        logger.warning(f"get_income_statement_tool failed for {ticker!r}: {exc}")
         return _error(str(exc))
     except Exception as exc:
+        logger.error(f"get_income_statement_tool unexpected error for {ticker!r}: {exc}")
         return _error(f"Unexpected error fetching income statement for '{ticker}': {exc}")
-
+    
 
 @mcp.tool
 def compare_stocks_tool(tickers: list[str]) -> dict[str, Any]:
@@ -179,13 +216,17 @@ def compare_stocks_tool(tickers: list[str]) -> dict[str, Any]:
         {"comparisons": [...], "failed": [{"ticker","error"}, ...]}, or
         {"error": True, "message": str} if the whole comparison failed.
     """
+    logger.info(f"compare_stocks_tool called with tickers={tickers}")
     try:
-        return fetch_stock_comparison(tickers)
+        result = fetch_stock_comparison(tickers)
+        logger.info(f"compare_stocks_tool: success for {tickers}")
+        return result
     except DataFetchError as exc:
+        logger.warning(f"compare_stocks_tool failed for {tickers}: {exc}")
         return _error(str(exc))
     except Exception as exc:
+        logger.error(f"compare_stocks_tool unexpected error for {tickers}: {exc}")
         return _error(f"Unexpected error comparing {tickers}: {exc}")
-
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http" , host = "127.0.0.1" , port = 8000)            
