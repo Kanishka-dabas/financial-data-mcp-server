@@ -13,9 +13,9 @@ structured logging.
 
 - **Language:** Python 3.12, managed with [uv](https://docs.astral.sh/uv/)
 - **Framework:** [FastMCP](https://gofastmcp.com) 4.0.3
-- **Data source:** [yfinance](https://github.com/ranaroussi/yfinance) (Yahoo Finance, no API key required)
-- **Deployment:** FastMCP Cloud (GitHub-connected, auto HTTPS)
-- **Transport:** `streamable-http` (remote/production)
+- **Data source:** [yfinance](https://github.com/ranaroussi/yfinance) (Yahoo Finance)
+- **Deployment:** FastMCP Cloud 
+- **Transport:** `streamable-http` 
 
 ## Architecture
 
