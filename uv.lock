@@ -577,7 +577,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fastmcp", specifier = ">=4.0.3" },
+    { name = "fastmcp", extras = ["auth"], specifier = ">=4.0.3" },
     { name = "yfinance", specifier = ">=1.7.0" },
 ]
 

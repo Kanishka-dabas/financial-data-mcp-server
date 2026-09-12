@@ -4,6 +4,7 @@ from dataclasses import asdict
 from typing import Any
 
 from fastmcp import FastMCP
+from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
 
 from data_fetcher import DataFetchError
 from data_fetcher import compare_stocks as fetch_stock_comparison
@@ -24,6 +25,14 @@ logger = logging.getLogger("financial-data-server")
 
 
 
+import os
+
+auth_provider = StaticTokenVerifier(
+    tokens={
+        os.environ["MCP_AUTH_TOKEN"]: {"client_id": "investor-intel-agent"}
+    }
+)
+
 mcp = FastMCP(
     name="financial-data-server",
     instructions=(
@@ -31,7 +40,8 @@ mcp = FastMCP(
         "Yahoo Finance. Use search_ticker to resolve a company name to a "
         "ticker symbol before calling other tools if you don't already "
         "have the exact ticker."
-    )
+    ),
+    auth=auth_provider,
 )
 
 def _error(message: str) -> dict[str, Any]:
@@ -229,4 +239,4 @@ def compare_stocks_tool(tickers: list[str]) -> dict[str, Any]:
         return _error(f"Unexpected error comparing {tickers}: {exc}")
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http" , host = "127.0.0.1" , port = 8000)            
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
